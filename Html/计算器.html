@@ -1,0 +1,120 @@
+<!-- @author Brocade -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>计算器</title>
+<style type="text/css">
+*{font-family:"微软雅黑";}
+table{border:solid 1px;}
+table td{
+	font-size:25px;
+	border:solid 1px;
+	width:50px;
+	height:50px;
+	text-align:center;
+	cursor:atuo;
+}
+#result{
+	text-align:right;
+	font-size:30px;
+	width:265px;
+}
+.main{
+	margin:0 auto;
+	display:table;
+}
+</style>
+<script type="text/javascript">
+var i=0;
+var showString=new Array();
+function getString(char)
+{
+	if(char=='+'||char=='-'||char=='*'||char=='/') i++;
+	if(i>1){
+		Result();
+		i++;
+	}
+	showString.push(char);
+	showResult();
+}
+function wipe()
+{
+	i=0;
+	document.getElementById("result").innerHTML=0;
+	showString=new Array();
+}
+function del()
+{
+	char=showString[showString.length-1];
+	if(char==undefined){
+		document.getElementById("result").innerHTML=0;
+		i=0;
+	}
+	else{
+		if(!(char=='+'||char=='-'||char=='*'||char=='/')){
+			showString.pop();
+		}
+		showResult();
+	}
+}
+function showResult()
+{
+	var x=showString;
+	document.getElementById("result").innerHTML=x.join('');
+}
+function Result()
+{
+	var num1, num2, result;
+	var temp=showString;
+	x=temp.join('');
+	if(x.indexOf('+')!=-1)
+	{
+		num=x.split('+');
+		num1=Number(num[0]);
+		num2=Number(num[1]);
+		result=num1+num2;
+	}
+	else if(x.indexOf('-')!=-1)
+	{
+		num=x.split('-');
+		num1=Number(num[0]);
+		num2=Number(num[1]);
+		result=num1-num2;
+	}
+	else if(x.indexOf('*')!=-1)
+	{
+		num=x.split('*');
+		num1=Number(num[0]);
+		num2=Number(num[1]);
+		result=num1*num2;
+	}
+	else if(x.indexOf('/')!=-1)
+	{
+		num=x.split('/');
+		num1=Number(num[0]);
+		num2=Number(num[1]);
+		result=num1/num2;
+	}
+	i=0;
+	showString=new Array();
+	document.getElementById("result").innerHTML=result;
+	showString.push(result);
+}
+</script>
+</head>
+
+<body onload="">
+<div class="main">
+<div id="debug"></div>
+<table id="table">
+<tr><td colspan="4" id="result">0</td></tr>
+<tr><td colspan="2" onClick="del()">CE</td><td colspan="2" onClick="wipe()">C</td></tr>
+<tr><td onClick="getString(7)">7</td><td onClick="getString(8)">8</td><td onClick="getString(9)">9</td><td onClick="getString('+')">+</td></tr>
+<tr><td onClick="getString(4)">4</td><td onClick="getString(5)">5</td><td onClick="getString(6)">6</td><td onClick="getString('-')">-</td></tr>
+<tr><td onClick="getString(1)">1</td><td onClick="getString(2)">2</td><td onClick="getString(3)">3</td><td onClick="getString('*')">*</td></tr>
+<tr><td onClick="getString(0)">0</td><td onClick="getString('.')">.</td><td onClick="Result()">=</td><td onClick="getString('/')">/</td></tr>
+</table>
+</div>
+</body>
+</html>

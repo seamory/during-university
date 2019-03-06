@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:mysql://xxx.xxx.xxx.xxx/FileShareSystem</property>
+        <property name="connection.username">username</property>
+        <property name="connection.password">password</property>
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <!-- 配置数据库方言dialect -->
+        <property name="connection.url">jdbc:mysql://xxx.xxx.xxx.xxx/filesharesystem</property>
+        <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+        <property name="connection.username">username</property>
+        <property name="connection.password">password</property>
+        <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
+
+        <!-- 指定自动生成数据表的策略 -->
+        <property name="hbm2ddl.auto">update</property>
+
+        <property name="c3p0.max_size">20</property>
+        <property name="c3p0.min_size">5</property>
+        <property name="c3p0.timeout">120</property>
+        <property name="c3p0.max_statements">100</property>
+        <property name="c3p0.idle_test_period">120</property>
+        <property name="c3p0.acquire_increment">2</property>
+        <property name="c3p0.validate">true</property>
+        <property name="connection.provider_class">
+            org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider
+        </property>
+<!--记得要安装!!!-->
+        <mapping resource="com/filesharesystem/models/File.hbm.xml"/>
+        <mapping resource="com/filesharesystem/models/FileData.hbm.xml"/>
+        <mapping resource="com/filesharesystem/models/FileCommit.hbm.xml"/>
+        <mapping resource="com/filesharesystem/models/User.hbm.xml"/>
+        <mapping resource="com/filesharesystem/models/UserData.hbm.xml"/>
+        <mapping resource="com/filesharesystem/models/IP.hbm.xml"/>
+    </session-factory>
+</hibernate-configuration>

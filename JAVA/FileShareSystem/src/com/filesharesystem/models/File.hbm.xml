@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.filesharesystem.models.File" table="file">
+        <id name="fid" column="fid" type="string">
+            <generator class="uuid"/>
+        </id>
+
+        <property name="fileName" column="filename" type="string"/>
+        <property name="fileType" column="filetype" type="string"/>
+        <property name="path" column="path" type="string"/>
+         <!--连接到USER表 多对一的关系-->
+        <many-to-one name="uid" column="uid"/>
+        <property name="status" column="status" type="integer"/>
+        <property name="type" column="type" type="integer"/>
+        <property name="created_at" column="created_at" type="timestamp"/>
+        <property name="updated_at" column="updated_at" type="timestamp"/>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,3 @@
+<?php
+CURLOPT_HTTP_VERSION();
+?>

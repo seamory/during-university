@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+    <constant name="struts.enable.DynamicMethodInvocation" value="true"/>
+    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.action.excludePattern" value="/static/.*?" /><!-- default locale -->
+    <constant name="struts.multipart.maxSize" value="4097152" />
+    <constant name="struts.multipart.saveDir" value="/tmp"/>
+    <constant name="struts.custom.i18n.resources" value="app"/>
+    <!--全局拦截-->
+    <package name="Interceptor" extends="struts-default">
+        <interceptors>
+            <interceptor name="singupInter" class="com.filesharesystem.filter.UserInterceptor"/>
+            <interceptor-stack name="interceptor-stack">
+                <interceptor-ref name="defaultStack"/>
+                <interceptor-ref name="singupInter"/>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="interceptor-stack"/>
+        <global-results>
+            <result name="login" type="redirect">./login.jsp</result>
+        </global-results>
+    </package>
+    <!--验证码-->
+    <package name="tools" extends="struts-default">
+        <action name="createImageAction" class="com.filesharesystem.action.CreateImageAction">
+            <result name="success" type="stream">
+                <param name="contentType">image/jpeg</param>
+                <param name="inputName">inputStream</param>
+            </result>
+        </action>
+    </package>
+    <!--登录部分-->
+    <package name="login" namespace="/" extends="struts-default">
+        <action name="signIn" class="com.filesharesystem.action.SignInAction">
+            <result name="user" type="redirect">./user/index.jsp</result>
+            <result name="error">./login.jsp</result>
+        </action>
+
+        <action name="signUp" class="com.filesharesystem.action.SignUpAction">
+            <result name="success">./user/index.jsp</result>
+            <result name="error">./login.jsp</result>
+        </action>
+
+        <action name="logout" class="com.filesharesystem.action.LogoutAction">
+            <result name="success" type="redirect">./login.jsp</result>
+        </action>
+    </package>
+    <package name="userOperation" namespace="/user" extends="Interceptor">
+    </package>
+
+    <package name="file" namespace="/user" extends="Interceptor">
+        <action name="CommitFile" class="com.filesharesystem.action.file.CommitFileAction">
+            <result name="success">./</result>
+            <result name="error">./</result>
+        </action>
+        <action name="DeleteFile" class="com.filesharesystem.action.file.DeleteAction">
+            <result name="success" type="redirect">./myFiles.jsp</result>
+            <result name="error">./myFiles.jsp</result>
+        </action>
+        <action name="FavoriteFile" class="com.filesharesystem.action.file.FavoritesAction">
+            <result name="success">./</result>
+            <result name="error">./</result>
+        </action>
+        <action name="CancelFavorite" class="com.filesharesystem.action.file.FavoritesCancelAction">
+            <result name="success">./myFavorites.jsp</result>
+            <result name="error">./myFavorites.jsp</result>
+        </action>
+        <action name="ListFile" class="com.filesharesystem.action.file.ListUserFilesAction">
+            <result name="success">./</result>
+            <result name="error">./</result>
+        </action>
+        <action name="ListRecord" class="com.filesharesystem.action.file.ListUserRecordAction">
+            <result name="success">./</result>
+            <result name="error">./</result>
+        </action>
+        <action name="SetType" class="com.filesharesystem.action.file.SetFileTypeAction">
+            <result name="success">./myFiles.jsp</result>
+            <result name="error">./FileEdit.jsp</result>
+        </action>
+        <action name="Download" class="com.filesharesystem.action.file.DownloadAction">
+            <param name="filePath">D:/</param>
+            <result name="success" type="stream">
+                <param name="inputName">inputStream</param>
+                <param name="contentType">contentType</param>
+                <param name="contentDisposition">attacthment;filename="${fileName}"</param>
+            </result>
+            <result name="error">./</result>
+        </action>
+        <action name="CancelDownload" class="com.filesharesystem.action.file.DownloadCancelAction">
+            <result name="success">./myDownloads.jsp</result>
+            <result name="error">./myDownloads.jsp</result>
+        </action>
+        <action name="Upload" class="com.filesharesystem.action.file.UploadAction">
+            <result name="success" type="redirect">./index.jsp</result>
+            <param name="savePath">D:/WorkSpace/FileShareSystem/data/</param>
+        </action>
+        <action name="VisitFile" class="com.filesharesystem.action.file.VisitAction">
+            <result name="success">./</result>
+            <result name="error">./</result>
+        </action>
+    </package>
+
+    <package name="user" namespace="/user" extends="Interceptor">
+        <action name="UserData" class="com.filesharesystem.action.user.ChangeDataAction">
+            <result name="success" type="redirect">userEdit.jsp</result>
+            <result name="error" type="redirect">userEdit.jsp</result>
+        </action>
+        <action name="UserCore" class="com.filesharesystem.action.user.ChangeAction">
+            <result name="success" type="redirect">userEdit.jsp</result>
+            <result name="error" type="redirect">userEdit.jsp</result>
+        </action>
+    </package>
+</struts>
