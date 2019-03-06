@@ -73,9 +73,9 @@ class Html{
     }
 
 	static public function tableToArrayByTrans($html, $offset = 0, $trans = false){
-		$TABLE = array();
+		$table = array();
 		$html = str_replace(array("<",">","[th","[/th]", "\r","\n"), array("[", "]","[td","[/td]","",""), $html);
-		$MatchRules = array(
+		$matchRules = array(
 					'/				#开始捕捉
 					\[table(.*?)\]	#起始table
 					(.*?)			#table之间的内容
@@ -88,8 +88,8 @@ class Html{
 					/isxS'
 		);
 
-		preg_match_all($MatchRules[0], $html, $tables, PREG_SET_ORDER);
-		preg_match_all($MatchRules[1], $tables[$offset][0], $trs, PREG_SET_ORDER);
+		preg_match_all($matchRules[0], $html, $tables, PREG_SET_ORDER);
+		preg_match_all($matchRules[1], $tables[$offset][0], $trs, PREG_SET_ORDER);
 
 		for($i = 0; $i < count($trs); $i++){
 			$tr[$i] = explode('#!!#!!#!!#', str_replace('[/td][td', '[/td]#!!#!!#!!#[td', $trs[$i][2]));
@@ -102,46 +102,51 @@ class Html{
 				preg_match_all('/\](.*)\[/s', $val, $tdValue, PREG_SET_ORDER);
 				if ( $row || $col ) {
 					if ($row && $col) {
-						$TABLE[$y][$x] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
+						$table[$y][$x] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
 						preg_match_all('/rowspan=\"(\d+)\"/i', $val, $rowValue, PREG_SET_ORDER);
 						preg_match_all('/colspan=\"(\d+)\"/i', $val, $colValue, PREG_SET_ORDER);
-						for ($i = 0; $i < $rowValue[0][1]; $i++) {
-							$TABLE[$y+$i][$x] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
-						}
-						for ($i = 0; $i < $colValue[0][1]; $i++) {
-							$TABLE[$y][$x++] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
-						}
+						// for ($i = 0; $i < $rowValue[0][1]; $i++) {
+							// $table[$y+$i][$x] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
+						// }
+						// for ($i = 0; $i < $colValue[0][1]; $i++) {
+							// $table[$y][$x++] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
+						// }
+                        for ($i = 0; $i < $colValue[0][1]; $i++, $x++) {
+                            for ($j = 0; $j < $rowValue[0][1]; $j++) {
+                                $table[$y+$j][$x] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
+                            }
+                        }
 					} elseif  ($row) {
 						preg_match_all('/rowspan=\"(\d+)\"/i', $val, $rowValue, PREG_SET_ORDER);
 						for ($i = 0; $i < $rowValue[0][1]; $i++) {
-							$TABLE[$y+$i][$x] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
+							$table[$y+$i][$x] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
 						}
 						$x++;
 					} elseif ($col) {
 						preg_match_all('/colspan=\"(\d+)\"/i', $val, $colValue, PREG_SET_ORDER);
 						for ($i = 0; $i < $colValue[0][1]; $i++) {
-							$TABLE[$y][$x++] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
+							$table[$y][$x++] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
 						}
 					}
 				} else {
-					while ( isset($TABLE[$y][$x]) || $TABLE[$y][$x] ) {
+					while ( isset($table[$y][$x]) || $table[$y][$x] ) {
 						$x++;
 					}
-					$TABLE[$y][$x++] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
+					$table[$y][$x++] = $trans ? $tdValue[0][1] : str_replace(array('[', ']'), array('<','>'), $tdValue[0][1]);
 				}
 			}
 		}
 
-		for ($i = 0; $i < count($TABLE); $i++) {
-			ksort($TABLE[$i]);
+		for ($i = 0; $i < count($table); $i++) {
+			ksort($table[$i]);
 		}
-		return $TABLE;
+		return $table;
 	}
 
 	static public function tableToArray($html, $offset = 0) {
-		$TABLE = array();
+		$table = array();
 		$html = str_replace(array("<th","</th>", "\r","\n"), array("<td","</td>","",""), $html);
-		$MatchRules = array(
+		$matchRules = array(
 			'/				#开始捕捉
 			<table(.*?)>	#起始table
 			(.*?)			#table之间的内容
@@ -159,78 +164,134 @@ class Html{
 			/isxS'
 		);
 
-		preg_match_all($MatchRules[0], $html, $tables, PREG_SET_ORDER);
-		preg_match_all($MatchRules[1], $tables[$offset][0], $trs, PREG_SET_ORDER);
+		preg_match_all($matchRules[0], $html, $tables, PREG_SET_ORDER);
+		preg_match_all($matchRules[1], $tables[$offset][0], $trs, PREG_SET_ORDER);
 
-		for($i = 0; $i < count($trs); $i++){
-			preg_match_all($MatchRules[2], $trs[$i][0], $tds, PREG_SET_ORDER);
-			for($j = 0; $j < count($tds); $j++){
+		for ($i = 0; $i < count($trs); $i++) {
+			preg_match_all($matchRules[2], $trs[$i][0], $tds, PREG_SET_ORDER);
+			for ($j = 0; $j < count($tds); $j++) {
 				$tr[$i][] = $tds[$j][0];
 			}
 		}
 
-		for($x = 0, $y = 0; $y < sizeof($tr); $x = 0, $y++){
-			foreach($tr[$y] as $key => $val){
+		for ($x = 0, $y = 0; $y < sizeof($tr); $x = 0, $y++) {
+			foreach ($tr[$y] as $key => $val) {
 				$row = preg_match('/(rowspan)/i', $val);
 				$col = preg_match('/(colspan)/i', $val);
 				preg_match_all('/<td(?:.*?)>(.*?)<\/td>/s', $val, $tdValue, PREG_SET_ORDER);
 				if ( $row || $col ) {
 					if ($row && $col) {
-						$TABLE[$y][$x] = $tdValue[0][1];
+						$table[$y][$x] = $tdValue[0][1];
 						preg_match_all('/rowspan=\"(\d+)\"/i', $val, $rowValue, PREG_SET_ORDER);
 						preg_match_all('/colspan=\"(\d+)\"/i', $val, $colValue, PREG_SET_ORDER);
-						for ($i = 0; $i < $rowValue[0][1]; $i++) {
-							$TABLE[$y+$i][$x] = $tdValue[0][1];
-						}
-						for ($i = 0; $i < $colValue[0][1]; $i++) {
-							$TABLE[$y][$x++] = $tdValue[0][1];
-						}
+						// for ($i = 0; $i < $rowValue[0][1]; $i++) {
+							// $table[$y+$i][$x] = $tdValue[0][1];
+						// }
+						// for ($i = 0; $i < $colValue[0][1]; $i++) {
+							// $table[$y][$x++] = $tdValue[0][1];
+						// }
+                        for ($i = 0; $i < $colValue[0][1]; $i++, $x++) {
+                            for ($j = 0; $j < $rowValue[0][1]; $j++) {
+                                $table[$y+$j][$x] = $tdValue[0][1];
+                            }
+                        }
 					} elseif  ($row) {
 						preg_match_all('/rowspan=\"(\d+)\"/i', $val, $rowValue, PREG_SET_ORDER);
 						for ($i = 0; $i < $rowValue[0][1]; $i++) {
-							$TABLE[$y+$i][$x] = $tdValue[0][1];
+							$table[$y+$i][$x] = $tdValue[0][1];
 						}
 						$x++;
 					} elseif ($col) {
 						preg_match_all('/colspan=\"(\d+)\"/i', $val, $colValue, PREG_SET_ORDER);
 						for ($i = 0; $i < $colValue[0][1]; $i++) {
-							$TABLE[$y][$x++] = $tdValue[0][1];
+							$table[$y][$x++] = $tdValue[0][1];
 						}
 					}
 				} else {
-					while ( isset($TABLE[$y][$x]) || $TABLE[$y][$x] ) {
+					while (isset($table[$y][$x]) || $table[$y][$x]) {
 						$x++;
 					}
-					$TABLE[$y][$x++] =$tdValue[0][1];
+					$table[$y][$x++] =$tdValue[0][1];
 				}
 			}
 		}
 
-		for ($i = 0; $i < count($TABLE); $i++) {
-			ksort($TABLE[$i]);
+		for ($i = 0; $i < count($table); $i++) {
+			ksort($table[$i]);
 		}
-		return $TABLE;
+		return $table;
 	}
 
 	static public function getTagA($html){
-		$MatchRules = array(
+		$matchRules = array(
 			'/
 			<a(?:.*?)href="(?:.*?)"(?:.*?)>
 			(.*?)
 			<\/a>
 			/isxS'
 		);
-		preg_match_all($MatchRules[0], $html, $tagA,PREG_SET_ORDER);
+		preg_match_all($matchRules[0], $html, $tagA,PREG_SET_ORDER);
 		return $tagA;
 	}
 
 	static public function getTagInput($html){
-		$MatchRules = array(
+		$matchRules = array(
 			'/
 			<input(.*?)>
 			/isxS'
 		);
-		preg_match_all($MatchRules[0], $html, $inputs, PREG_SET_ORDER);
+		preg_match_all($matchRules[0], $html, $inputs, PREG_SET_ORDER);
 		return $inputs;
 	}
-}}
+}
+
+# example for table to array function
+$table = '<table border="1">
+<tr>
+<td rowspan="2" colspan="2">1-1</td><td >测试</td>
+</tr>
+<tr><td>测试</td></tr>
+<tr><td>测试</td><td>测试</td><td>测试</td></tr>
+</table>';
+
+$table1 = '<table border="1">
+<tr>
+  <th>姓名</th>
+  <th colspan="2">电话</th>
+</tr>
+<tr>
+  <td>Bill Gates</td>
+  <td>555 77 854</td>
+  <td>555 77 855</td>
+</tr>
+</table>';
+
+$table2 = '<table border="1">
+<tr>
+  <th>姓名</th>
+  <td>Bill Gates</td>
+</tr>
+<tr>
+  <th rowspan="2">电话</th>
+  <td>555 77 854</td>
+</tr>
+<tr>
+  <td>555 77 855</td>
+</tr>
+</table>';
+
+$table3 ='<table border="1">
+<tr>
+  <th>姓名</th>
+  <td colspan="2">Bill Gates</td>
+</tr>
+<tr>
+  <th rowspan="2">电话</th>
+  <td>555 77 854</td>
+<td>555 77 854</td>
+</tr>
+<tr>
+  <td>555 77 855</td>
+<td>555 77 854</td>
+</tr>
+</table>';
