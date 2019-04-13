@@ -165,17 +165,17 @@ class Html{
         );
 
         preg_match_all($matchRules[0], $html, $tables, PREG_SET_ORDER);
-        preg_match_all($matchRules[1], $tables[$offset][0], $trs, PREG_SET_ORDER);
+        preg_match_all($matchRules[1], $tables[$offset][0], $tr, PREG_SET_ORDER);
 
-        for ($i = 0; $i < count($trs); $i++) {
-            preg_match_all($matchRules[2], $trs[$i][0], $tds, PREG_SET_ORDER);
-            for ($j = 0; $j < count($tds); $j++) {
-                $tr[$i][] = $tds[$j][0];
+        for ($i = 0; $i < count($tr); $i++) {
+            preg_match_all($matchRules[2], $tr[$i][0], $td, PREG_SET_ORDER);
+            for ($j = 0; $j < count($td); $j++) {
+                $pretable[$i][] = $td[$j][0];
             }
         }
 
-        for ($x = 0, $y = 0; $y < sizeof($tr); $x = 0, $y++) {
-            foreach ($tr[$y] as $key => $val) {
+        for ($x = 0, $y = 0; $y < sizeof($pretable); $x = 0, $y++) {
+            foreach ($pretable[$y] as $key => $val) {
                 $row = preg_match('/(rowspan)/i', $val);
                 $col = preg_match('/(colspan)/i', $val);
                 preg_match_all('/<td(?:.*?)>(.*?)<\/td>/s', $val, $tdValue, PREG_SET_ORDER);
